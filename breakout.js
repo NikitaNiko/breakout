@@ -1,22 +1,18 @@
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-
 //first ball
 var x1 = Math.floor(canvas.width / 2);
 var y1 = canvas.height - 80;
 var dx1 = 2;
 var dy1 = -2;
 var ballRarius = 10;
-
 //paddle
 var paddleHeight = 10;
 var paddleWidth = 75;
 var paddleX = (canvas.width-paddleWidth) / 2;
-
 //moving
 var rightPress = false;
 var leftPress = false;
-
 //bricks
 var brickRowCount = 3;
 var brickColumnCount = 7;
@@ -26,23 +22,22 @@ var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 var done = 0;
-
 //score
 var score = 0;
-
 //lives
 var lives = 3;
-
+//bricks
 var bricks = [];
 for (var c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (var r = 0; r < brickRowCount; r++) {
         bricks[c][r] = { x: 0, y: 0, status: 1};
-
     }
 }
 
+
 function drawBricks() {
+
     for (c = 0; c < brickColumnCount; c++) {
         for (r = 0; r < brickRowCount; r++) { 
             var brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
@@ -71,6 +66,7 @@ function drawBricks() {
 
         }
     }
+
 }
 
 
@@ -88,6 +84,7 @@ function drawBall() {
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
+
 }
 
 function drawPaddle() {
@@ -104,9 +101,12 @@ function drawPaddle() {
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.closePath();
+
 }
+
 //DESTROY BRICKS
 function destroyBricks() {
+
     for (c = 0; c < brickColumnCount; c++) {
         for (r = 0; r < brickRowCount; r++) {
             //cheking ball's taps at bricks
@@ -124,12 +124,12 @@ function destroyBricks() {
                 score += 10;
             }
         }
-
     }
 
 }
 
 function drawScore() {
+
     ctx.font = "16px Arial";
     ctx.strokeStyle = "#461ca9";
     ctx.strokeText("Score: " + score, 8, 20);
@@ -137,32 +137,26 @@ function drawScore() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#df0950";
     ctx.fillText("Score: " + score, 8, 20);
+
 }
 
 function drawLives() {
+
     ctx.font = "16px Arial";
     ctx.fillStyle = "df0950";
     ctx.fillText(lives + " lives", canvas.width - 80, 20)
+
 }
 
 function isWin() {
     
     alert("You Win!\nScore: " + score);
     document.location.reload();
+
 }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBricks();
-    drawBall();
-    destroyBricks();
-    drawPaddle();
-    drawScore();
-    drawLives();
-    checking();
-    requestAnimationFrame(draw);
+function checkingWalls() {
 
-function checking() {
     if (done == brickColumnCount * brickRowCount) {
         isWin();
     }
@@ -207,23 +201,35 @@ function checking() {
         //if ball y1 + ballRadius < canvas.height - paddleHeight && (paddleX < x1 < paddleX + paddleWeight) == false
         //ball go in to the precipice
         else {
-            lives--;
-            x1 = Math.floor(canvas.width / 2);
-            y1 = Math.floor(canvas.height / 2);
-            dx1 = 0;
-            dy1 = 1;
-            paddleX = (canvas.width - paddleWidth) / 2;
-        }
-        //If lives == 0
-        if (!lives) {
-            alert("GAME OVER\nScore: " + score);
-            document.location.reload();
-        }
-        //if score > 0 then ball's bounce from bit and lose one point 
-        if (score > 0) {
-            score--;
+            isMiss();
         }
     }
+
+}
+
+function isMiss() {
+
+    lives--;
+    x1 = Math.floor(canvas.width / 2);
+    y1 = Math.floor(canvas.height / 2);
+    dx1 = 0;
+    dy1 = 1;
+    paddleX = (canvas.width - paddleWidth) / 2;
+
+    //If lives == 0
+    if (!lives) {
+        alert("GAME OVER\nScore: " + score);
+        document.location.reload();
+    }
+    //if score > 0 then ball's bounce from bit and lose one point 
+    if (score > 0) {
+        score--;
+    }
+
+}
+
+function movePaddle() {
+
     //If was pressed a key
     if (rightPress && (paddleX + paddleWidth) < canvas.width) {
         paddleX += 4;
@@ -231,40 +237,62 @@ function checking() {
     else if (leftPress && (paddleX > 0)) {
         paddleX -= 4;
     }
-    //Ball's move
-    x1 += dx1;
-    y1 += dy1;
-}
-}
 
-    //keys and mouse:
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-document.addEventListener("mousemove", mouseMoveHandler, false);
+}
 
 function keyDownHandler(e) {
+
     if (e.keyCode == 39) {
         rightPress = true;
     }
     else if (e.keyCode == 37) {
         leftPress = true;
     }
+
 }
 
 function keyUpHandler(e) {
+
     if (e.keyCode == 39) {
         rightPress = false;
     }
     else if (e.keyCode == 37) {
         leftPress = false;
     }
+
 }
 
 function mouseMoveHandler(e) {
+
     var relativeX = e.clientX - canvas.offsetLeft;
     if (relativeX > 0 && relativeX < canvas.width) {
         paddleX = relativeX - paddleWidth / 2;
     }
+
 }
+
+function draw() {
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBricks();
+    drawBall();
+    destroyBricks();
+    drawPaddle();
+    drawScore();
+    drawLives();
+    checkingWalls();
+    movePaddle();
+//Ball's move
+    x1 += dx1;
+    y1 += dy1;
+
+    requestAnimationFrame(draw);
+
+}
+
+//keys and mouse:
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
 draw();
