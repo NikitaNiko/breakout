@@ -168,16 +168,16 @@ function checking() {
     }
     
     //Checking bariers
-    //for ball
-    if (x1 + ballRarius > canvas.width || x1 < ballRarius) {
+    //for ball and left and right walls
+    else if (x1 + ballRarius > canvas.width || x1 < ballRarius) {
         dx1 = -dx1;
     }
+    //for ball and ceiling
     else if (y1 < ballRarius) {
         dy1 = -dy1;
     }
+    //for ball and bottom 
     else if (canvas.height-(paddleHeight + ballRarius) < y1) {
-        //checking bounce at pad (left, middle left, middle right, right).
-
         //if bounced at left pad's side.
         if (x1 > paddleX && x1 < paddleX + Math.floor(paddleWidth / 2)) {
             //if bounced at just left pad's side.
@@ -204,7 +204,8 @@ function checking() {
                 dx1 = 2;
             }
         }
-        
+        //if ball y1 + ballRadius < canvas.height - paddleHeight && (paddleX < x1 < paddleX + paddleWeight) == false
+        //ball go in to the precipice
         else {
             lives--;
             x1 = Math.floor(canvas.width / 2);
@@ -213,26 +214,24 @@ function checking() {
             dy1 = 1;
             paddleX = (canvas.width - paddleWidth) / 2;
         }
-
+        //If lives == 0
         if (!lives) {
             alert("GAME OVER\nScore: " + score);
             document.location.reload();
         }
-
+        //if score > 0 then ball's bounce from bit and lose one point 
         if (score > 0) {
             score--;
         }
-        
     }
-
-    //for paddle
+    //If was pressed a key
     if (rightPress && (paddleX + paddleWidth) < canvas.width) {
         paddleX += 4;
     }
     else if (leftPress && (paddleX > 0)) {
         paddleX -= 4;
     }
-
+    //Ball's move
     x1 += dx1;
     y1 += dy1;
 }
